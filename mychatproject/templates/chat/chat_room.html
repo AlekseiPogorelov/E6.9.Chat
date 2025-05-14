@@ -1,0 +1,55 @@
+{% load static %}
+<script src="{% static 'chat/js/chat.js' %}"></script>
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Чат: {{ room.name }}</title>
+</head>
+<body>
+    <h1>Чат: {{ room.name }}</h1>
+
+    <div id="chat-log" style="height: 300px; overflow-y: auto; border: 1px solid #ccc;"></div>
+
+    <input id="chat-message-input" type="text" placeholder="Введите сообщение..." autocomplete="off" />
+    <button id="chat-message-send">Отправить</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const roomName = '{{ room.id }}';
+            const wsScheme = window.location.protocol === "https:" ? "wss" : "ws";
+            const chatSocket = new WebSocket(`${wsScheme}://${window.location.host}/ws/chat/${roomName}/`);
+
+            const chatLog = document.getElementById('chat-log');
+            const messageInput = document.getElementById('chat-message-input');
+            const sendButton = document.getElementById('chat-message-send');
+
+            chatSocket.onopen = () => console.log('WebSocket соединение установлено');
+            chatSocket.onerror = (e) => console.error('Ошибка WebSocket', e);
+            chatSocket.onclose = () => console.log('WebSocket соединение закрыто');
+
+            chatSocket.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                const messageElem = document.createElement('div');
+                messageElem.textContent = `${data.username}: ${data.message}`;
+                chatLog.appendChild(messageElem);
+                chatLog.scrollTop = chatLog.scrollHeight;
+            };
+
+            function sendMessage() {
+                const message = messageInput.value.trim();
+                if (message && chatSocket.readyState === WebSocket.OPEN) {
+                    chatSocket.send(JSON.stringify({message}));
+                    messageInput.value = '';
+                }
+            }
+
+            sendButton.onclick = sendMessage;
+            messageInput.onkeyup = (e) => {
+                if (e.key === 'Enter') sendMessage();
+            };
+        });
+    </script>
+</body>
+</html>

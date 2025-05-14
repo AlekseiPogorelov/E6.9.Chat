@@ -1,0 +1,75 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Главная - ChatApp{% endblock %}
+
+{% block content %}
+<h1>Добро пожаловать{% if user.is_authenticated %}, {{ user.username }}{% endif %}</h1>
+
+{% if not user.is_authenticated %}
+<div class="card p-4 mb-4">
+    <h2>Регистрация</h2>
+    <form method="post" enctype="multipart/form-data" class="row g-3">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="col-md-6">
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {{ form.username.errors }}
+        </div>
+        <div class="col-md-6">
+            {{ form.avatar.label_tag }}
+            {{ form.avatar }}
+            {{ form.avatar.errors }}
+        </div>
+        <div class="col-md-6">
+            {{ form.password1.label_tag }}
+            {{ form.password1 }}
+            {{ form.password1.errors }}
+        </div>
+        <div class="col-md-6">
+            {{ form.password2.label_tag }}
+            {{ form.password2 }}
+            {{ form.password2.errors }}
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+        </div>
+    </form>
+</div>
+{% else %}
+<div class="row">
+    <div class="col-md-6">
+        <h2>Чаты</h2>
+        <ul class="list-group mb-4">
+            {% for chat in chatrooms %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <a href="{% url 'chat_room' chat.id %}">{{ chat.name }}</a>
+                <span class="badge bg-primary rounded-pill">{{ chat.participants.count }}</span>
+            </li>
+            {% empty %}
+            <li class="list-group-item">У вас пока нет чатов</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="col-md-6">
+        <h2>Пользователи</h2>
+        <ul class="list-group">
+    {% for u in users %}
+    <li class="list-group-item d-flex align-items-center">
+        {% if u.profile.avatar %}
+            <img src="{{ u.profile.avatar.url }}" alt="{{ u.username }}" class="rounded-circle me-2" style="width:40px; height:40px; object-fit:cover;">
+        {% else %}
+            <img src="{% static 'images/default_avatar.png' %}" alt="Default avatar" class="rounded-circle me-2" style="width:40px; height:40px; object-fit:cover;">
+        {% endif %}
+        <a href="{% url 'private_chat' u.id %}">{{ u.username }}</a>
+    </li>
+    {% empty %}
+    <li class="list-group-item">Других пользователей нет</li>
+    {% endfor %}
+</ul>
+    </div>
+</div>
+<a href="{% url 'profile_edit' %}" class="btn btn-secondary mt-3">Редактировать профиль</a>
+{% endif %}
+{% endblock %}
