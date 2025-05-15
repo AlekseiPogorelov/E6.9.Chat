@@ -9,3 +9,7 @@
 
 Запуск сервера с webSocket осуществляется командой daphne -b 0.0.0.0 -p 8000 core.asgi:application
 При стантандартной команде python manage.py runserver - не запускается ASGI
+
+Главная страница - http://localhost:8000/
+Редактирование профиля - http://localhost:8000/profile/edit/
+Комнаты с чатами - http://localhost:8000/chat/2/   (пример)
