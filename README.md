@@ -11,5 +11,7 @@
 При стантандартной команде python manage.py runserver - не запускается ASGI
 
 Главная страница - http://localhost:8000/
+
 Редактирование профиля - http://localhost:8000/profile/edit/
+
 Комнаты с чатами - http://localhost:8000/chat/2/   (пример)
